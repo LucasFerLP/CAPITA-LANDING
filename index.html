@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAPITAL — Descubrí el lado B de Buenos Aires</title>
+<meta name="description" content="CAPITAL conecta la escena cultural de Buenos Aires: eventos de música, arte y gastronomía, y gente que va a los mismos planes que vos. Descargá la demo Android.">
+<meta name="theme-color" content="#121212">
+
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header" id="header">
+  <div class="wrap header-inner">
+    <a href="#inicio" class="logo">CAPITAL</a>
+
+    <nav class="main-nav" id="main-nav" aria-label="Navegación principal">
+      <a href="#explorar">Explorá</a>
+      <a href="#conectar">Conectá</a>
+      <a href="#stack">Stack</a>
+      <a href="#beta" class="nav-cta">Descargar demo</a>
+    </nav>
+
+    <button class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="mobile-nav" aria-label="Abrir menú">
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+      <span class="nav-toggle-bar"></span>
+    </button>
+  </div>
+
+  <div class="mobile-nav" id="mobile-nav" hidden>
+    <a href="#explorar">Explorá</a>
+    <a href="#conectar">Conectá</a>
+    <a href="#stack">Stack</a>
+    <a href="#beta" class="nav-cta">Descargar demo</a>
+  </div>
+</header>
+
+<main id="contenido">
+
+  <!-- HERO -->
+  <section class="hero" id="inicio">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="wrap hero-inner">
+      <div class="hero-copy reveal">
+        <p class="eyebrow">Demo Android · Beta cerrada</p>
+        <h1 class="hero-title">La ciudad está<br>pasando. <span class="hl">Conectá.</span></h1>
+        <p class="hero-sub">
+          Olvidate de los algoritmos de siempre. Descubrí el lado B de Buenos Aires
+          y cruzate con gente que va a los mismos planes que vos.
+        </p>
+        <div class="hero-actions">
+          <a href="#beta" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v13"/><path d="m6 11 6 6 6-6"/><path d="M5 21h14"/></svg>
+            Descargar demo Android
+          </a>
+          <a href="#conectar" class="btn btn-ghost">Unirme a la beta</a>
+        </div>
+        <p class="hero-note">Trabajo final · Instituto Da Vinci</p>
+      </div>
+
+      <div class="hero-visual reveal" role="img" aria-label="Mockup de la app CAPITAL mostrando un mapa nocturno de Buenos Aires con eventos categorizados por música, arte y gastronomía">
+        <div class="phone">
+          <div class="phone-notch" aria-hidden="true"></div>
+          <div class="phone-screen">
+            <div class="app-topbar">
+              <span class="app-wordmark">CAPITAL</span>
+              <span class="app-dot" aria-hidden="true"></span>
+            </div>
+            <div class="app-map" aria-hidden="true">
+              <div class="map-grid"></div>
+              <button class="pin pin-m" style="--x:28%; --y:34%;" tabindex="-1"><span>M</span></button>
+              <button class="pin pin-a" style="--x:62%; --y:22%;" tabindex="-1"><span>A</span></button>
+              <button class="pin pin-f" style="--x:48%; --y:56%;" tabindex="-1"><span>F</span></button>
+              <button class="pin pin-m pin-sm" style="--x:74%; --y:64%;" tabindex="-1"><span>M</span></button>
+              <button class="pin pin-a pin-sm" style="--x:20%; --y:70%;" tabindex="-1"><span>A</span></button>
+            </div>
+            <div class="app-card">
+              <p class="app-card-title">Feria Under · Almagro</p>
+              <p class="app-card-meta">Arte &middot; a 8 min &middot; 34 van</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 1: MAPA -->
+  <section class="feature feature-map" id="explorar">
+    <div class="wrap feature-inner">
+      <div class="feature-copy reveal">
+        <p class="eyebrow eyebrow-m">Exploración</p>
+        <h2 class="feature-title">No des más vueltas.</h2>
+        <p class="feature-desc">
+          Encontrá eventos de música, arte o gastronomía filtrados por lo que
+          realmente importa: tu barrio y tu vibra. Todo en un mapa interactivo
+          pensado para la noche.
+        </p>
+        <ul class="feature-list">
+          <li><span class="tag tag-m">Música</span> recitales, fiestas indie, DJ sets de barrio.</li>
+          <li><span class="tag tag-a">Arte</span> muestras under, ferias, intervenciones.</li>
+          <li><span class="tag tag-f">Food</span> barras y previas fuera del circuito de siempre.</li>
+        </ul>
+      </div>
+
+      <div class="feature-visual reveal">
+        <div class="map-card" role="img" aria-label="Mapa interactivo estilo editorial con pines de categorías sobre la cuadrícula de Buenos Aires">
+          <div class="map-card-grid" aria-hidden="true"></div>
+          <div class="map-card-scan" aria-hidden="true"></div>
+          <button class="pin pin-lg pin-a" style="--x:30%; --y:28%;" tabindex="-1"><span>A</span></button>
+          <button class="pin pin-lg pin-m" style="--x:58%; --y:44%;" tabindex="-1"><span>M</span></button>
+          <button class="pin pin-lg pin-f" style="--x:70%; --y:68%;" tabindex="-1"><span>F</span></button>
+          <button class="pin pin-lg pin-m pin-sm" style="--x:22%; --y:66%;" tabindex="-1"><span>M</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE 2: MATCH -->
+  <section class="feature feature-match" id="conectar">
+    <div class="wrap feature-inner feature-inner-rev">
+      <div class="feature-visual reveal">
+        <div class="match-stack">
+          <article class="match-card">
+            <div class="match-avatar" style="--from:#ff6b35; --to:#c9a9ff;" aria-hidden="true"></div>
+            <div class="match-info">
+              <p class="match-name">Feria de Arte · Almagro</p>
+              <div class="match-tags">
+                <span class="tag tag-a">Arte</span>
+                <span class="tag tag-m">Música</span>
+              </div>
+            </div>
+          </article>
+          <article class="match-card match-card-offset">
+            <div class="match-avatar" style="--from:#6fe3e0; --to:#c6f24e;" aria-hidden="true"></div>
+            <div class="match-info">
+              <p class="match-name">Recital indie · San Telmo</p>
+              <div class="match-tags">
+                <span class="tag tag-m">Música</span>
+                <span class="tag tag-f">Food</span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="feature-copy reveal">
+        <p class="eyebrow eyebrow-a">Match orgánico</p>
+        <h2 class="feature-title">Tu previa empieza acá.</h2>
+        <p class="feature-desc">
+          ¿Vas a un recital indie o a una muestra de fotografía? Mirá quiénes
+          van a los mismos eventos y conectá desde los intereses compartidos
+          antes de llegar.
+        </p>
+        <p class="feature-desc feature-desc-sm">
+          Sin swipes al azar: el match nace de un plan real, en un lugar real,
+          la misma noche.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STACK TÉCNICO -->
+  <section class="stack-section" id="stack">
+    <div class="wrap">
+      <p class="stack-eyebrow">Desarrollado para escalar</p>
+      <p class="stack-desc">Arquitectura MVVM en Android, consumo de API REST propia y persistencia en la nube.</p>
+      <ul class="stack-credits" aria-label="Tecnologías utilizadas">
+        <li>Kotlin</li>
+        <li>Android&nbsp;Studio</li>
+        <li>Node.js</li>
+        <li>MongoDB&nbsp;Atlas</li>
+        <li>JWT</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- WAITLIST / DOWNLOAD -->
+  <section class="beta-section" id="beta">
+    <div class="wrap beta-inner reveal">
+      <h2 class="beta-title">No te quedes afuera<br>del circuito.</h2>
+      <p class="beta-desc">Dejá tu mail y te avisamos apenas esté disponible la próxima tanda de la demo.</p>
+
+      <form class="beta-form" id="beta-form" novalidate>
+        <div class="field">
+          <label for="beta-email">Tu email</label>
+          <input type="email" id="beta-email" name="email" placeholder="vos@ejemplo.com" required autocomplete="email" aria-describedby="beta-error">
+          <p class="field-error" id="beta-error" role="alert" hidden>Ingresá un email válido para sumarte.</p>
+        </div>
+        <button type="submit" class="btn btn-primary">Unirme a la beta</button>
+      </form>
+      <p class="beta-success" id="beta-success" role="status" hidden>
+        Listo. Te escribimos apenas se abra el próximo cupo.
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <div class="footer-brand">
+      <p class="logo">CAPITAL</p>
+      <p class="footer-tag">Trabajo final · Instituto Da Vinci</p>
+    </div>
+    <nav class="footer-links" aria-label="Enlaces del proyecto">
+      <a href="https://github.com/" target="_blank" rel="noopener noreferrer">Repositorio en GitHub</a>
+      <a href="https://linkedin.com/" target="_blank" rel="noopener noreferrer">Equipo en LinkedIn</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/js/main.js"></script>
+</body>
+</html>
