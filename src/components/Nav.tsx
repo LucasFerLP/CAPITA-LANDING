@@ -16,7 +16,7 @@ function PrimaryCta({ onClick }: { onClick?: () => void }) {
       onClick={onClick}
       className="press inline-block whitespace-nowrap border-2 border-ink bg-signal px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest"
     >
-      [ Obtener acceso ]
+      Obtener acceso
     </a>
   );
 }
@@ -62,7 +62,7 @@ export function Nav() {
         ))}
 
         <div className="hidden items-center justify-center whitespace-nowrap border-r-2 border-ink px-5 text-[10px] uppercase tracking-widest xl:flex">
-          [ BUE // <NavClock /> ART ]
+          BUE // <NavClock /> ART
         </div>
 
         <div className="hidden items-center border-r-2 border-ink px-4 sm:flex">
@@ -111,7 +111,7 @@ export function Nav() {
               </a>
             ))}
             <div className="border-b-2 border-ink px-6 py-4 text-[10px] uppercase tracking-widest">
-              [ BUE // <NavClock /> ART ]
+              BUE // <NavClock /> ART
             </div>
             <div className="grid grid-cols-[auto_minmax(0,1fr)] border-b-2 border-ink sm:hidden">
               <div className="flex items-center border-r-2 border-ink px-5 py-4">

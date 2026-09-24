@@ -30,10 +30,10 @@ export function Features() {
       {FEATURES.map((feature, i) => (
         <div
           key={feature.title}
-          className={`min-h-72 border-b-2 border-ink px-5 py-10 last:border-b-0 sm:px-10 lg:min-h-96 lg:border-r-2 lg:border-b-0 lg:last:border-r-0 ${feature.cell}`}
+          className={`border-b-2 border-ink px-5 py-12 last:border-b-0 sm:px-10 lg:border-r-2 lg:border-b-0 lg:py-14 lg:last:border-r-0 ${feature.cell}`}
         >
           <motion.div
-            className="flex h-full flex-col justify-between gap-12"
+            className="flex flex-col gap-5"
             initial={reduce ? false : { opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.25 }}
