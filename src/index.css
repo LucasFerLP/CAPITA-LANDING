@@ -1,0 +1,84 @@
+@import "tailwindcss";
+@import "@fontsource-variable/archivo/wdth.css";
+@import "@fontsource-variable/jetbrains-mono";
+
+@theme {
+  --color-paper: #f0f0eb;
+  --color-ink: #000000;
+  --color-signal: #ff0000;
+
+  --font-display: "Archivo Variable", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --shadow-hard: 4px 4px 0 0 #000000;
+  --shadow-hard-lg: 6px 6px 0 0 #000000;
+  --shadow-hard-xl: 8px 8px 0 0 #000000;
+
+  --animate-blink: blink 1s steps(1) infinite;
+
+  @keyframes blink {
+    0%,
+    49% {
+      opacity: 1;
+    }
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+}
+
+@utility font-condensed {
+  font-stretch: 75%;
+}
+
+/* Hard-offset shadow that lifts on hover and presses flat on click. */
+@utility press {
+  box-shadow: var(--shadow-hard);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-hard-lg);
+  }
+
+  &:active {
+    transform: translate(2px, 2px);
+    box-shadow: none;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper font-mono text-ink antialiased;
+  }
+
+  section[id] {
+    scroll-margin-top: 66px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-signal);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0s !important;
+      animation-duration: 0s !important;
+      animation-iteration-count: 1 !important;
+    }
+  }
+}

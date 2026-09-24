@@ -1,0 +1,10 @@
+node_modules
+dist
+*.local
+*.tsbuildinfo
+.DS_Store
+
+# Local agent tooling
+.agents
+.claude
+skills-lock.json
