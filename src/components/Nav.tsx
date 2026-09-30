@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { NavClock } from "./Clock";
 import { LangToggle, type Lang } from "./LangToggle";
@@ -9,15 +10,14 @@ const LINKS = [
   { href: "#hosts", label: "Acceso hosts" },
 ];
 
-function PrimaryCta({ onClick }: { onClick?: () => void }) {
+function PrimaryCta() {
   return (
-    <a
-      href="#top"
-      onClick={onClick}
+    <Link
+      to="/login"
       className="press inline-block whitespace-nowrap border-2 border-ink bg-signal px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest"
     >
       Obtener acceso
-    </a>
+    </Link>
   );
 }
 
@@ -118,7 +118,7 @@ export function Nav() {
                 <LangToggle value={lang} onChange={setLang} />
               </div>
               <div className="flex items-center px-5 py-4">
-                <PrimaryCta onClick={close} />
+                <PrimaryCta />
               </div>
             </div>
           </motion.nav>

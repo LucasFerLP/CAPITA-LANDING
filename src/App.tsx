@@ -1,21 +1,15 @@
-import { Nav } from "./components/Nav";
-import { Hero } from "./components/Hero";
-import { Manifesto } from "./components/Manifesto";
-import { Features } from "./components/Features";
-import { Hosts } from "./components/Hosts";
-import { Footer } from "./components/Footer";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import Landing from "./pages/Landing";
+import Login from "./pages/Login";
 
 export default function App() {
   return (
-    <>
-      <Nav />
-      <main>
-        <Hero />
-        <Manifesto />
-        <Features />
-        <Hosts />
-      </main>
-      <Footer />
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
