@@ -5,6 +5,7 @@ export class AuthError extends Error {}
 
 export type AuthUser = { id: number; email: string; name: string };
 type AuthResponse = { token: string; user: AuthUser };
+type AuthPath = "login" | "register" | "forgot-password" | "reset-password";
 
 const GENERIC_ERROR = "Algo salió mal de nuestro lado. Probá de nuevo en unos minutos.";
 
@@ -17,7 +18,7 @@ async function readMessage(response: Response) {
   }
 }
 
-async function postAuth(path: "login" | "register", body: Record<string, string>) {
+async function postAuth(path: AuthPath, body: Record<string, string>) {
   if (!API_URL) {
     throw new AuthError("El acceso todavía no está habilitado. Probá de nuevo más tarde.");
   }
@@ -38,7 +39,11 @@ async function postAuth(path: "login" | "register", body: Record<string, string>
     throw new AuthError((await readMessage(response)) ?? GENERIC_ERROR);
   }
   if (!response.ok) throw new AuthError(GENERIC_ERROR);
+  return response;
+}
 
+async function startSession(path: "login" | "register", body: Record<string, string>) {
+  const response = await postAuth(path, body);
   const session = (await response.json()) as AuthResponse;
   saveSession(session);
   return session.user;
@@ -53,10 +58,19 @@ function saveSession({ token, user }: AuthResponse) {
 }
 
 export function signIn(email: string, password: string) {
-  return postAuth("login", { email, password });
+  return startSession("login", { email, password });
 }
 
 // The backend has no alias field yet: the alias is stored as the user's display name.
 export function signUp(alias: string, email: string, password: string) {
-  return postAuth("register", { name: alias, email, password });
+  return startSession("register", { name: alias, email, password });
+}
+
+// The backend answers the same whether or not the email exists, so this never reveals accounts.
+export async function requestPasswordReset(email: string) {
+  await postAuth("forgot-password", { email });
+}
+
+export async function resetPassword(email: string, code: string, password: string) {
+  await postAuth("reset-password", { email, code, password });
 }
