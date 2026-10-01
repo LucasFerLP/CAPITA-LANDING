@@ -1,21 +1,49 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { Link } from "react-router";
-import { motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Footer } from "../components/Footer";
 import { Reveal } from "../components/Reveal";
-import { AuthError, signIn } from "../lib/auth";
+import { AuthError, signIn, signUp } from "../lib/auth";
 import { EASE_RISE } from "../lib/motion";
 
-type FieldErrors = { email?: string; password?: string };
+type Mode = "login" | "signup";
+type Field = "alias" | "email" | "password";
+type FieldErrors = Partial<Record<Field, string>>;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const ALIAS_PATTERN = /^[a-zA-Z0-9_.]{3,20}$/;
+const MIN_PASSWORD = 8;
 const HEADLINE = ["Entrá al", "circuito."];
 
-function validate(email: string, password: string): FieldErrors {
+const COPY = {
+  login: {
+    header: "Iniciar sesión",
+    submit: "Ingresar",
+    loading: "Ingresando...",
+    success: "Sesión iniciada.",
+    switchPrompt: "¿No estás registrado?",
+    switchAction: "Solicitar acceso",
+  },
+  signup: {
+    header: "Crear cuenta",
+    submit: "Registrate",
+    loading: "Registrando...",
+    success: "Cuenta creada.",
+    switchPrompt: "¿Ya tenés cuenta?",
+    switchAction: "Iniciar sesión",
+  },
+} as const;
+
+function validate(mode: Mode, alias: string, email: string, password: string): FieldErrors {
   const errors: FieldErrors = {};
+  if (mode === "signup") {
+    if (!alias.trim()) errors.alias = "Elegí un alias.";
+    else if (!ALIAS_PATTERN.test(alias.trim())) errors.alias = "Entre 3 y 20 caracteres: letras, números, punto o guion bajo.";
+  }
   if (!email.trim()) errors.email = "Ingresá tu email.";
   else if (!EMAIL_PATTERN.test(email.trim())) errors.email = "Revisá el formato del email.";
   if (!password) errors.password = "Ingresá tu contraseña.";
+  else if (mode === "signup" && password.length < MIN_PASSWORD) errors.password = `Usá al menos ${MIN_PASSWORD} caracteres.`;
   return errors;
 }
 
@@ -29,16 +57,65 @@ function FieldError({ id, message }: { id: string; message?: string }) {
   );
 }
 
+type TextFieldProps = {
+  id: Field;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  inputRef: RefObject<HTMLInputElement | null>;
+  type?: string;
+  inputMode?: "email" | "text";
+  autoComplete: string;
+  placeholder?: string;
+  trailing?: ReactNode;
+};
+
+function TextField({ id, label, value, onChange, error, inputRef, type = "text", inputMode, autoComplete, placeholder, trailing }: TextFieldProps) {
+  const errorId = `${id}-error`;
+  return (
+    <div className="flex flex-col gap-2">
+      <label htmlFor={id} className="text-[10px] font-bold uppercase tracking-widest">
+        {label}
+      </label>
+      <div className="flex border-2 border-ink bg-white">
+        <input
+          ref={inputRef}
+          id={id}
+          name={id}
+          type={type}
+          inputMode={inputMode}
+          autoComplete={autoComplete}
+          placeholder={placeholder}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          aria-invalid={!!error}
+          aria-describedby={error ? errorId : undefined}
+          className="min-w-0 flex-1 bg-white px-3 py-3 text-sm placeholder:text-neutral-500"
+        />
+        {trailing}
+      </div>
+      <FieldError id={errorId} message={error} />
+    </div>
+  );
+}
+
 export default function Login() {
   const reduce = useReducedMotion();
+  const [mode, setMode] = useState<Mode>("login");
+  const [alias, setAlias] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
-  const emailRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
+  const refs = {
+    alias: useRef<HTMLInputElement>(null),
+    email: useRef<HTMLInputElement>(null),
+    password: useRef<HTMLInputElement>(null),
+  };
+  const switchedMode = useRef(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -49,18 +126,35 @@ export default function Login() {
     };
   }, []);
 
+  // Move focus into the new view after the card swaps, but not on first load.
+  useEffect(() => {
+    if (!switchedMode.current) return;
+    const first = mode === "signup" ? refs.alias : refs.email;
+    const id = setTimeout(() => first.current?.focus(), reduce ? 0 : 200);
+    return () => clearTimeout(id);
+  }, [mode]);
+
+  function switchMode() {
+    switchedMode.current = true;
+    setMode((m) => (m === "login" ? "signup" : "login"));
+    setErrors({});
+    setFormError(null);
+    setStatus("idle");
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const nextErrors = validate(email, password);
+    const nextErrors = validate(mode, alias, email, password);
     setErrors(nextErrors);
     setFormError(null);
 
-    if (nextErrors.email) return emailRef.current?.focus();
-    if (nextErrors.password) return passwordRef.current?.focus();
+    const firstInvalid = (["alias", "email", "password"] as const).find((f) => nextErrors[f]);
+    if (firstInvalid) return refs[firstInvalid].current?.focus();
 
     setStatus("loading");
     try {
-      await signIn(email.trim(), password);
+      if (mode === "signup") await signUp(alias.trim(), email.trim(), password);
+      else await signIn(email.trim(), password);
       setStatus("success");
     } catch (error) {
       setStatus("idle");
@@ -68,6 +162,7 @@ export default function Login() {
     }
   }
 
+  const copy = COPY[mode];
   const loading = status === "loading";
 
   return (
@@ -111,85 +206,105 @@ export default function Login() {
         </div>
 
         <Reveal delay={0.25} className="w-full min-w-0 max-w-[460px] lg:justify-self-end">
-          <div className="border-2 border-ink bg-white shadow-hard-xl">
-            <div className="border-b-2 border-ink px-4 py-3 text-[10px] uppercase tracking-widest">Iniciar sesión</div>
+          <div className="overflow-hidden border-2 border-ink bg-white shadow-hard-xl">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={mode}
+                initial={reduce ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduce ? { opacity: 0 } : { opacity: 0, y: -10 }}
+                transition={{ duration: 0.16, ease: "easeOut" }}
+              >
+                <h2 className="border-b-2 border-ink px-4 py-3 text-[10px] font-normal uppercase tracking-widest">{copy.header}</h2>
 
-            {status === "success" ? (
-              <div role="status" className="flex flex-col gap-3 px-5 py-8 sm:px-6">
-                <p className="font-display text-3xl leading-none font-black font-condensed uppercase">Sesión iniciada.</p>
-                <Link to="/" className="text-xs uppercase tracking-widest underline underline-offset-4">
-                  Volver al inicio
-                </Link>
-              </div>
-            ) : (
-              <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5 px-5 py-6 sm:px-6">
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest">
-                    Email
-                  </label>
-                  <input
-                    ref={emailRef}
-                    id="email"
-                    name="email"
-                    type="email"
-                    inputMode="email"
-                    autoComplete="email"
-                    placeholder="vos@mail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    aria-invalid={!!errors.email}
-                    aria-describedby={errors.email ? "email-error" : undefined}
-                    className="w-full border-2 border-ink bg-white px-3 py-3 text-sm placeholder:text-neutral-500"
-                  />
-                  <FieldError id="email-error" message={errors.email} />
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="password" className="text-[10px] font-bold uppercase tracking-widest">
-                    Contraseña
-                  </label>
-                  <div className="flex border-2 border-ink bg-white">
-                    <input
-                      ref={passwordRef}
-                      id="password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      autoComplete="current-password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      aria-invalid={!!errors.password}
-                      aria-describedby={errors.password ? "password-error" : undefined}
-                      className="min-w-0 flex-1 bg-white px-3 py-3 text-sm"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((v) => !v)}
-                      aria-pressed={showPassword}
-                      aria-controls="password"
-                      className="cursor-pointer border-l-2 border-ink px-3 text-[10px] uppercase tracking-widest transition-colors hover:bg-ink hover:text-paper"
-                    >
-                      {showPassword ? "Ocultar" : "Mostrar"}
-                    </button>
+                {status === "success" ? (
+                  <div role="status" className="flex flex-col gap-3 px-5 py-8 sm:px-6">
+                    <p className="font-display text-3xl leading-none font-black font-condensed uppercase">{copy.success}</p>
+                    <Link to="/" className="text-xs uppercase tracking-widest underline underline-offset-4">
+                      Volver al inicio
+                    </Link>
                   </div>
-                  <FieldError id="password-error" message={errors.password} />
-                </div>
+                ) : (
+                  <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-5 px-5 py-6 sm:px-6">
+                    {mode === "signup" && (
+                      <TextField
+                        id="alias"
+                        label="Alias"
+                        value={alias}
+                        onChange={setAlias}
+                        error={errors.alias}
+                        inputRef={refs.alias}
+                        autoComplete="username"
+                        placeholder="tu_alias"
+                      />
+                    )}
 
-                {formError && (
-                  <p role="alert" className="border-2 border-ink bg-signal px-3 py-2.5 text-xs leading-relaxed">
-                    {formError}
-                  </p>
+                    <TextField
+                      id="email"
+                      label="Email"
+                      value={email}
+                      onChange={setEmail}
+                      error={errors.email}
+                      inputRef={refs.email}
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      placeholder="vos@mail.com"
+                    />
+
+                    <TextField
+                      id="password"
+                      label="Contraseña"
+                      value={password}
+                      onChange={setPassword}
+                      error={errors.password}
+                      inputRef={refs.password}
+                      type={showPassword ? "text" : "password"}
+                      autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                      placeholder={mode === "signup" ? `Mínimo ${MIN_PASSWORD} caracteres` : undefined}
+                      trailing={
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          aria-pressed={showPassword}
+                          aria-controls="password"
+                          className="cursor-pointer border-l-2 border-ink px-3 text-[10px] uppercase tracking-widest transition-colors hover:bg-ink hover:text-paper"
+                        >
+                          {showPassword ? "Ocultar" : "Mostrar"}
+                        </button>
+                      }
+                    />
+
+                    {formError && (
+                      <p role="alert" className="border-2 border-ink bg-signal px-3 py-2.5 text-xs leading-relaxed">
+                        {formError}
+                      </p>
+                    )}
+
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      aria-busy={loading}
+                      className="press mt-1 w-full cursor-pointer border-2 border-ink bg-signal px-4 py-3.5 text-xs font-bold uppercase tracking-widest disabled:cursor-wait disabled:opacity-70"
+                    >
+                      {loading ? copy.loading : copy.submit}
+                    </button>
+
+                    <p className="text-[11px] uppercase tracking-widest text-neutral-600">
+                      <span aria-hidden="true">&gt; </span>
+                      {copy.switchPrompt}{" "}
+                      <button
+                        type="button"
+                        onClick={switchMode}
+                        className="cursor-pointer font-bold text-ink uppercase tracking-widest underline-offset-4 hover:underline"
+                      >
+                        {copy.switchAction}
+                      </button>
+                    </p>
+                  </form>
                 )}
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  aria-busy={loading}
-                  className="press mt-1 w-full cursor-pointer border-2 border-ink bg-signal px-4 py-3.5 text-xs font-bold uppercase tracking-widest disabled:cursor-wait disabled:opacity-70"
-                >
-                  {loading ? "Ingresando..." : "Ingresar"}
-                </button>
-              </form>
-            )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </Reveal>
       </main>
