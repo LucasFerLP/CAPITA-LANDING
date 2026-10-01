@@ -1,33 +1,62 @@
 const API_URL: string | undefined = import.meta.env.VITE_API_URL;
+const SESSION_KEY = "capital.session";
 
 export class AuthError extends Error {}
 
-async function post(path: string, body: Record<string, string>) {
+export type AuthUser = { id: number; email: string; name: string };
+type AuthResponse = { token: string; user: AuthUser };
+
+const GENERIC_ERROR = "Algo salió mal de nuestro lado. Probá de nuevo en unos minutos.";
+
+async function readMessage(response: Response) {
+  try {
+    const body = (await response.json()) as { message?: string };
+    return body.message;
+  } catch {
+    return undefined;
+  }
+}
+
+async function postAuth(path: "login" | "register", body: Record<string, string>) {
   if (!API_URL) {
     throw new AuthError("El acceso todavía no está habilitado. Probá de nuevo más tarde.");
   }
+
+  let response: Response;
   try {
-    return await fetch(`${API_URL}${path}`, {
+    response = await fetch(`${API_URL.replace(/\/$/, "")}/api/auth/${path}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "include",
       body: JSON.stringify(body),
     });
   } catch {
     throw new AuthError("No pudimos conectarnos. Revisá tu conexión y probá de nuevo.");
   }
-}
 
-const GENERIC_ERROR = "Algo salió mal de nuestro lado. Probá de nuevo en unos minutos.";
-
-export async function signIn(email: string, password: string) {
-  const response = await post("/auth/login", { email, password });
   if (response.status === 401) throw new AuthError("Email o contraseña incorrectos.");
+  if (response.status === 400 || response.status === 409) {
+    throw new AuthError((await readMessage(response)) ?? GENERIC_ERROR);
+  }
   if (!response.ok) throw new AuthError(GENERIC_ERROR);
+
+  const session = (await response.json()) as AuthResponse;
+  saveSession(session);
+  return session.user;
 }
 
-export async function signUp(alias: string, email: string, password: string) {
-  const response = await post("/auth/register", { alias, email, password });
-  if (response.status === 409) throw new AuthError("Ese alias o email ya está en uso.");
-  if (!response.ok) throw new AuthError(GENERIC_ERROR);
+function saveSession({ token, user }: AuthResponse) {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ token, user: { id: user.id, email: user.email, name: user.name } }));
+  } catch {
+    // Storage can be unavailable (private mode); the login itself still succeeded.
+  }
+}
+
+export function signIn(email: string, password: string) {
+  return postAuth("login", { email, password });
+}
+
+// The backend has no alias field yet: the alias is stored as the user's display name.
+export function signUp(alias: string, email: string, password: string) {
+  return postAuth("register", { name: alias, email, password });
 }

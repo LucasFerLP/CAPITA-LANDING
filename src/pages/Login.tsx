@@ -12,7 +12,7 @@ type FieldErrors = Partial<Record<Field, string>>;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ALIAS_PATTERN = /^[a-zA-Z0-9_.]{3,20}$/;
-const MIN_PASSWORD = 8;
+const MIN_PASSWORD = 6;
 const HEADLINE = ["Entrá al", "circuito."];
 
 const COPY = {
@@ -110,6 +110,7 @@ export default function Login() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+  const [userName, setUserName] = useState("");
   const refs = {
     alias: useRef<HTMLInputElement>(null),
     email: useRef<HTMLInputElement>(null),
@@ -153,8 +154,8 @@ export default function Login() {
 
     setStatus("loading");
     try {
-      if (mode === "signup") await signUp(alias.trim(), email.trim(), password);
-      else await signIn(email.trim(), password);
+      const user = mode === "signup" ? await signUp(alias.trim(), email.trim(), password) : await signIn(email.trim(), password);
+      setUserName(user.name);
       setStatus("success");
     } catch (error) {
       setStatus("idle");
@@ -220,6 +221,7 @@ export default function Login() {
                 {status === "success" ? (
                   <div role="status" className="flex flex-col gap-3 px-5 py-8 sm:px-6">
                     <p className="font-display text-3xl leading-none font-black font-condensed uppercase">{copy.success}</p>
+                    {userName && <p className="text-sm">Hola, {userName}.</p>}
                     <Link to="/" className="text-xs uppercase tracking-widest underline underline-offset-4">
                       Volver al inicio
                     </Link>
